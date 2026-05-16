@@ -5,21 +5,36 @@ import type {
 } from "@choiceform/os-api";
 import type { ITask } from "./task";
 import { getOsApi } from "./os-api";
-// import { exampleJsonData } from "./example-json-data";
-import { jsonData2 } from "./json-data-2";
 
-const task = jsonData2;
+const UPLOADABLE_STATUSES = [
+  "created",
+  "committed",
+  "examine_passed",
+  "examine_failed",
+  "examine_skipped",
+] as const;
+
+type UploadableStatus = (typeof UPLOADABLE_STATUSES)[number];
+
+function isUploadableStatus(status: string): status is UploadableStatus {
+  return (UPLOADABLE_STATUSES as readonly string[]).includes(status);
+}
 
 async function formatParamsWithoutUploading(task: ITask) {
   const [taskInfo, taskResult] = task;
   const { task_name, created_at, payload_digest, examined_at } = taskInfo;
 
   const newResult = taskResult.result;
+  const status = newResult.status;
+
+  if (!isUploadableStatus(status)) {
+    throw new Error(`Unsupported upload status: ${status}`);
+  }
 
   const commitParams = {
     // 提交时的常规属性
-    status: newResult.status as Exclude<RESPONSE_STATUS, "test">,
-    created_at: created_at,
+    status,
+    created_at,
     options_display_info: newResult.options_display_info,
     query_params: newResult.query_params,
     var_map_info: newResult.var_map_info,
@@ -62,7 +77,7 @@ async function formatParamsWithoutUploading(task: ITask) {
   }
 }
 
-export async function uploadManually() {
+export async function uploadManually(task: ITask) {
   const params = await formatParamsWithoutUploading(task);
   const api = await getOsApi();
   return api.response.upload(params);
