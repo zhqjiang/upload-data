@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "types": ["@choiceform/os-client-core"],
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "#/*": ["./src/*"]
+    }
+  }
+}
