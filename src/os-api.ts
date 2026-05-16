@@ -1,8 +1,8 @@
 import axios from "axios";
+import OSApi, { type IRequestParams } from "@choiceform/os-api";
 
 export function getOptions() {
   const host = "https://osapi.choiceform.com";
-  // const host = "/api";
 
   const instance = axios.create({});
 
