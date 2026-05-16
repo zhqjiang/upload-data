@@ -1,5 +1,39 @@
-import axios from "axios";
 import OSApi, { type IRequestParams } from "@choiceform/os-api";
+import axios from "axios";
+
+const JWT_STORAGE_KEY = "os-api-jwt";
+
+export function getStoredJwt() {
+  if (typeof localStorage === "undefined") {
+    return "";
+  }
+
+  return localStorage.getItem(JWT_STORAGE_KEY) ?? "";
+}
+
+export function setStoredJwt(jwt: string) {
+  if (typeof localStorage === "undefined") {
+    return;
+  }
+
+  const trimmedJwt = jwt.trim();
+  if (trimmedJwt) {
+    localStorage.setItem(JWT_STORAGE_KEY, trimmedJwt);
+    return;
+  }
+
+  localStorage.removeItem(JWT_STORAGE_KEY);
+}
+
+async function getJwt() {
+  const jwt = getStoredJwt();
+
+  if (!jwt) {
+    throw new Error("Missing OS API JWT. Enter one in the app first.");
+  }
+
+  return jwt;
+}
 
 export function getOptions() {
   const host = "https://osapi.choiceform.com";
@@ -11,10 +45,9 @@ export function getOptions() {
     request: async <T, U>(params: IRequestParams<U>): Promise<T> => {
       let resp;
       if (params.method === "GET") {
-        const data = params.data;
-        delete params.data;
+        const { data, ...rest } = params;
         const opt = {
-          ...params,
+          ...rest,
           params: data,
         };
         resp = await instance(opt);
