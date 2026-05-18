@@ -72,13 +72,6 @@ function validateTask(task: ITask) {
     return errors;
   }
 
-  const status = result.status;
-  if (!isSupportedUploadStatus(status)) {
-    errors.push(
-      "Unsupported result status. Expected one of: created, committed, examine_passed, examine_failed, examine_skipped."
-    );
-  }
-
   if (!Array.isArray(result.options_display_info)) {
     errors.push("Missing required key: task[1].result.options_display_info");
   }

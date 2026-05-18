@@ -25,7 +25,7 @@ async function formatParamsWithoutUploading(task: ITask) {
   const { task_name, created_at, payload_digest, examined_at } = taskInfo;
 
   const newResult = taskResult.result;
-  const status = newResult.status;
+  const status = newResult.status || "committed";
 
   if (!isUploadableStatus(status)) {
     throw new Error(`Unsupported upload status: ${status}`);
